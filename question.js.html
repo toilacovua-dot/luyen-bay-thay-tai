@@ -1,288 +1,252 @@
 
 <style>
+import Link from 'next/link';
+
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
-  .exam{font-family:var(--font-sans);background:var(--color-background-tertiary);min-height:600px}
-  .exam-nav{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
-  .exam-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
-  .exam-meta{font-size:12px;color:var(--color-text-secondary)}
-  .timer-wrap{display:flex;align-items:center;gap:8px}
-  .timer-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 14px;font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;min-width:80px;text-align:center}
-  .timer-box.warn{background:#faeeda;color:#854f0b;border-color:#ef9f27}
-  .timer-box.danger{background:#fcebeb;color:#a32d2d;border-color:#e24b4a}
-  .timer-label{font-size:11px;color:var(--color-text-secondary)}
-  .progress-bar-top{height:3px;background:var(--color-border-tertiary)}
-  .progress-bar-fill{height:3px;background:#1a56db;transition:width 0.4s}
-  .exam-body{display:grid;grid-template-columns:1fr 200px;gap:0;min-height:560px}
-  .question-panel{padding:24px;border-right:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
-  .q-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-  .q-badge{background:#e6f1fb;color:#0c447c;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px}
-  .q-number{font-size:13px;color:var(--color-text-secondary)}
-  .q-nav-arrows{margin-left:auto;display:flex;gap:6px}
-  .arrow-btn{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);display:flex;align-items:center;justify-content:center;transition:background 0.15s}
-  .arrow-btn:hover{background:var(--color-background-tertiary)}
-  .arrow-btn:disabled{opacity:0.35;cursor:default}
-  .q-text{font-size:15px;line-height:1.7;color:var(--color-text-primary);margin-bottom:20px;font-weight:400}
-  .q-img{width:100%;max-width:360px;height:140px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-text-tertiary)}
-  .choices{display:flex;flex-direction:column;gap:8px}
-  .choice{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);cursor:pointer;transition:border-color 0.15s,background 0.15s;background:var(--color-background-primary)}
-  .choice:hover{border-color:var(--color-border-secondary);background:var(--color-background-secondary)}
-  .choice.selected{border-color:#1a56db;background:#e6f1fb}
-  .choice.correct{border-color:#3b6d11;background:#eaf3de}
-  .choice.wrong{border-color:#a32d2d;background:#fcebeb}
-  .choice-key{width:26px;height:26px;border-radius:50%;border:0.5px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;color:var(--color-text-secondary);transition:all 0.15s}
-  .choice.selected .choice-key{background:#1a56db;border-color:#1a56db;color:#fff}
-  .choice.correct .choice-key{background:#3b6d11;border-color:#3b6d11;color:#fff}
-  .choice.wrong .choice-key{background:#a32d2d;border-color:#a32d2d;color:#fff}
-  .choice-text{font-size:14px;line-height:1.6;color:var(--color-text-primary);padding-top:2px}
-  .explain-box{margin-top:14px;padding:12px 14px;background:var(--color-background-secondary);border-left:2px solid #1a56db;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;font-size:13px;color:var(--color-text-secondary);line-height:1.6;display:none}
-  .explain-box.show{display:block}
-  .q-footer{margin-top:20px;padding-top:16px;border-top:0.5px solid var(--color-border-tertiary);display:flex;justify-content:space-between;align-items:center}
-  .flag-btn{background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:6px;padding:6px 14px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans);display:flex;align-items:center;gap:6px;transition:all 0.15s}
-  .flag-btn:hover{background:var(--color-background-secondary)}
-  .flag-btn.flagged{border-color:#ef9f27;color:#854f0b;background:#faeeda}
-  .flag-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
-  .submit-btn{background:#1a56db;color:#fff;border:none;border-radius:6px;padding:7px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-sans);transition:opacity 0.15s}
-  .submit-btn:hover{opacity:0.88}
-  .sidebar{padding:16px;background:var(--color-background-primary)}
-  .sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px}
-  .q-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:16px}
-  .q-dot{width:100%;aspect-ratio:1;border-radius:5px;border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s;color:var(--color-text-secondary);background:var(--color-background-secondary)}
-  .q-dot:hover{border-color:var(--color-border-secondary)}
-  .q-dot.answered{background:#e6f1fb;border-color:#85b7eb;color:#0c447c}
-  .q-dot.flagged-dot{background:#faeeda;border-color:#ef9f27;color:#854f0b}
-  .q-dot.active{background:#1a56db;border-color:#1a56db;color:#fff}
-  .q-dot.correct-dot{background:#eaf3de;border-color:#97c459;color:#27500a}
-  .q-dot.wrong-dot{background:#fcebeb;border-color:#f09595;color:#791f1f}
-  .legend{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-  .legend-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--color-text-secondary)}
-  .legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-  .sidebar-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .stat-mini{background:var(--color-background-secondary);border-radius:6px;padding:8px;text-align:center}
-  .stat-mini-num{font-size:18px;font-weight:500;color:var(--color-text-primary)}
-  .stat-mini-label{font-size:10px;color:var(--color-text-secondary);margin-top:1px}
-  .result-screen{display:none;padding:32px 24px;text-align:center;background:var(--color-background-primary);min-height:540px;flex-direction:column;align-items:center;justify-content:center}
-  .result-screen.show{display:flex}
-  .score-ring{width:100px;height:100px;border-radius:50%;border:3px solid #1a56db;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px}
-  .score-big{font-size:26px;font-weight:500;color:#1a56db}
-  .score-denom{font-size:12px;color:var(--color-text-secondary)}
-  .result-title{font-size:18px;font-weight:500;margin-bottom:6px}
-  .result-sub{font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:24px}
-  .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:360px;margin-bottom:24px}
-  .result-stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px}
-  .result-stat-num{font-size:20px;font-weight:500}
-  .result-stat-label{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
-  .result-actions{display:flex;gap:10px;justify-content:center}
+  .lp{font-family:'Be Vietnam Pro',sans-serif;background:var(--color-background-tertiary);color:var(--color-text-primary);overflow-x:hidden}
+  .nav{display:flex;justify-content:space-between;align-items:center;padding:18px 48px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);position:sticky;top:0;z-index:100}
+  .nav-logo{font-weight:700;font-size:15px;letter-spacing:-0.3px;display:flex;align-items:center;gap:8px}
+  .logo-mark{width:28px;height:28px;background:#1a56db;border-radius:6px;display:flex;align-items:center;justify-content:center}
+  .logo-mark svg{width:16px;height:16px}
+  .nav-links{display:flex;gap:28px;list-style:none}
+  .nav-links a{text-decoration:none;font-size:14px;color:var(--color-text-secondary);font-weight:400;transition:color 0.2s}
+  .nav-links a:hover{color:var(--color-text-primary)}
+  .nav-cta{background:#1a56db;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:opacity 0.2s}
+  .nav-cta:hover{opacity:0.88}
+
+  .hero{padding:80px 48px 64px;max-width:960px;margin:0 auto}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--color-background-info);color:var(--color-text-info);font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;margin-bottom:24px}
+  .hero-badge-dot{width:6px;height:6px;background:var(--color-text-info);border-radius:50%}
+  .hero h1{font-family:'Playfair Display',serif;font-size:52px;line-height:1.15;letter-spacing:-1px;margin-bottom:20px;max-width:720px}
+  .hero h1 span{color:#1a56db}
+  .hero-sub{font-size:16px;color:var(--color-text-secondary);line-height:1.7;max-width:520px;margin-bottom:36px;font-weight:400}
+  .hero-actions{display:flex;align-items:center;gap:16px}
+  .btn-primary{background:#1a56db;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;cursor:pointer;transition:opacity 0.2s;border:none;font-family:inherit}
+  .btn-primary:hover{opacity:0.88}
+  .btn-secondary{font-size:14px;color:var(--color-text-secondary);display:flex;align-items:center;gap:6px;cursor:pointer;text-decoration:none;font-weight:400}
+  .btn-secondary:hover{color:var(--color-text-primary)}
+  .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:56px;padding-top:40px;border-top:0.5px solid var(--color-border-tertiary)}
+  .stat{padding:4px 0}
+  .stat-num{font-size:26px;font-weight:700;color:var(--color-text-primary);letter-spacing:-0.5px}
+  .stat-label{font-size:13px;color:var(--color-text-secondary);margin-top:2px}
+
+  .section{padding:56px 48px;max-width:960px;margin:0 auto}
+  .section-label{font-size:11px;font-weight:600;letter-spacing:1.5px;color:var(--color-text-secondary);text-transform:uppercase;margin-bottom:12px}
+  .section-title{font-size:26px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px}
+  .section-sub{font-size:14px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:36px}
+
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .feature-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:20px}
+  .feat-icon{width:36px;height:36px;border-radius:8px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .feat-icon.blue{background:var(--color-background-info);color:var(--color-text-info)}
+  .feat-icon.green{background:var(--color-background-success);color:var(--color-text-success)}
+  .feat-icon.amber{background:var(--color-background-warning);color:var(--color-text-warning)}
+  .feat-icon.pink{background:#fbeaf0;color:#993556}
+  .feat-icon.teal{background:#e1f5ee;color:#0f6e56}
+  .feat-icon.purple{background:#eeedfe;color:#534ab7}
+  .feature-card h3{font-size:14px;font-weight:600;margin-bottom:6px}
+  .feature-card p{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+
+  .courses{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .course-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:20px;cursor:pointer;transition:border-color 0.2s}
+  .course-card:hover{border-color:var(--color-border-secondary)}
+  .course-meta{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .course-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:0.3px}
+  .tag-math{background:var(--color-background-info);color:var(--color-text-info)}
+  .tag-phys{background:#fbeaf0;color:#993556}
+  .tag-chem{background:#e1f5ee;color:#0f6e56}
+  .tag-lit{background:#faedda;color:#854f0b}
+  .course-dot{width:4px;height:4px;border-radius:50%;background:var(--color-border-secondary)}
+  .course-card h3{font-size:15px;font-weight:600;margin-bottom:6px;letter-spacing:-0.2px}
+  .course-card p{font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:14px}
+  .course-footer{display:flex;align-items:center;justify-content:space-between}
+  .course-progress-wrap{flex:1;margin-right:12px}
+  .progress-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px}
+  .progress-bar{height:3px;background:var(--color-border-tertiary);border-radius:2px;overflow:hidden}
+  .progress-fill{height:100%;background:#1a56db;border-radius:2px;transition:width 0.6s ease}
+  .lessons-count{font-size:12px;color:var(--color-text-secondary);white-space:nowrap}
+
+  .testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .testi-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:20px}
+  .testi-score{font-size:22px;font-weight:700;color:#1a56db;margin-bottom:4px}
+  .testi-text{font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:14px}
+  .testi-author{display:flex;align-items:center;gap:10px;border-top:0.5px solid var(--color-border-tertiary);padding-top:12px}
+  .testi-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+  .testi-name{font-size:13px;font-weight:500}
+  .testi-school{font-size:12px;color:var(--color-text-secondary)}
+
+  .cta-section{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:16px;padding:48px;margin:0 48px 64px;text-align:center}
+  .cta-section h2{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:10px}
+  .cta-section p{font-size:14px;color:var(--color-text-secondary);margin-bottom:24px;line-height:1.7}
+
+  .divider{height:0.5px;background:var(--color-border-tertiary);margin:0 48px}
+
+  svg text{font-family:'Be Vietnam Pro',sans-serif}
 </style>
 
-<h2 class="sr-only">Giao diện phòng thi trực tuyến với 10 câu hỏi, đồng hồ đếm ngược và bảng điều hướng câu hỏi.</h2>
-<div class="exam" id="examRoot">
-  <div id="examMain">
-    <div class="exam-nav">
-      <div>
-        <div class="exam-title">Đề thi thử Toán THPTQG — Mã đề 132</div>
-        <div class="exam-meta">Nguyễn Văn An &nbsp;·&nbsp; Lớp 12A1</div>
+	
+<div class="lp">
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 2L14 8L8 14" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 8h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
       </div>
-      <div class="timer-wrap">
-        <div>
-          <div class="timer-label" style="text-align:right">Thời gian còn lại</div>
-          <div class="timer-box" id="timerDisp">90:00</div>
+      Luyện bay cùng thầy Đặng Anh Tài
+    </div>
+    <ul class="nav-links">
+      <li><a href="#">Trang chủ</a></li>
+      <li><a href="#">Bài giảng</a></li>
+      <li><a href="https://tailieuonthi.org/">Tài liệu</a></li>
+      <li><a href="https://dethitracnghiem.vn/thi-chuyen-cap/on-tap-thi-thpt-dai-hoc/thi-thu-toan-thpt-dai-hoc/#lamngay">Thi thử</a></li> 
+    </ul>
+    <button class="nav-cta" onclick="sendPrompt('Tôi muốn xem trang đăng nhập / đăng ký ↗')">Đăng nhập</button>
+  </nav>
+
+  <section style="background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary)">
+    <div class="hero">
+      <div class="hero-badge"><div class="hero-badge-dot"></div> Nền tảng học tập THPT hàng đầu</div>
+      <h1>Quyết tâm trượt đại học<br><span>Ôn luyện baccarat</span>,<br>Học thành thủ khoa cùng NYT study</h1>
+      <p class="hero-sub">Hệ thống bài giảng, đề thi và tài liệu được cá nhân hoá theo lộ trình của từng học sinh — giúp bạn chinh phục mục tiêu điểm số một cách có hệ thống.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="sendPrompt('Tôi muốn bắt đầu học, cho tôi xem các khoá học ↗')">Bắt đầu miễn phí</button>
+        <a class="btn-secondary" href="#">Xem video giới thiệu →</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">12,000+</div><div class="stat-label">Học sinh tin tưởng</div></div>
+        <div class="stat"><div class="stat-num">850+</div><div class="stat-label">Bài giảng video</div></div>
+        <div class="stat"><div class="stat-num">98%</div><div class="stat-label">Học sinh trật đại học</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+
+
+  <section class="section">
+    <div class="section-label">Tính năng</div>
+    <div class="section-title">Mọi thứ bạn cần trong một nơi</div>
+    <div class="section-sub">Từ video bài giảng, tài liệu PDF đến phòng thi thử — được thiết kế dành riêng cho học sinh THPT.</div>
+    <div class="features">
+      <div class="feature-card">
+        <div class="feat-icon blue">▶</div>
+        <h3>Video bài giảng HD</h3>
+        <p>Kho hơn 850 video bài giảng chất lượng cao, có thể xem lại bất kỳ lúc nào.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon green">✎</div>
+        <h3>Thi thử trực tuyến</h3>
+        <p>Hệ thống đề thi chuẩn cấu trúc thi THPTQG, chấm điểm và phân tích kết quả tức thì.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon amber">⬇</div>
+        <h3>Tài liệu PDF/Word</h3>
+        <p>Tải về tài liệu, đề cương và bộ đề ôn tập được biên soạn kỹ lưỡng.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon pink">◈</div>
+        <h3>Lộ trình cá nhân hoá</h3>
+        <p>Hệ thống đề xuất bài học phù hợp theo điểm yếu và mục tiêu của từng học sinh.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon teal">◉</div>
+        <h3>Theo dõi tiến độ</h3>
+        <p>Dashboard trực quan giúp học sinh và phụ huynh nắm rõ quá trình học tập.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon purple">⊞</div>
+        <h3>Quản lý lớp học</h3>
+        <p>Thầy giáo có thể giao bài, theo dõi và quản lý học sinh trên một nền tảng duy nhất.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section">
+    <div class="section-label">Khoá học nổi bật</div>
+    <div class="section-title">Bắt đầu từ môn học của bạn</div>
+    <div class="section-sub">Các khoá học được thiết kế bám sát chương trình THPT và cấu trúc đề thi đại học.</div>
+    <div class="courses">
+      <div class="course-card" onclick="sendPrompt('Cho tôi xem chi tiết khoá Toán THPT ↗')">
+        <div class="course-meta"><span class="course-tag tag-math">Toán</span><div class="course-dot"></div><span style="font-size:12px;color:var(--color-text-secondary)">Cơ bản → Nâng cao</span></div>
+        <h3>Toán học THPT — Ôn thi đại học</h3>
+        <p>Đại số, Hình học, Giải tích. Hệ thống bài tập phân cấp từ dễ đến khó theo từng chuyên đề.</p>
+        <div class="course-footer">
+          <div class="course-progress-wrap"><div class="progress-label">120 bài giảng</div><div class="progress-bar"><div class="progress-fill" style="width:78%"></div></div></div>
+          <span class="lessons-count">78% học sinh hoàn thành</span>
+        </div>
+      </div>
+      <div class="course-card" onclick="sendPrompt('Cho tôi xem chi tiết khoá Vật Lý THPT ↗')">
+        <div class="course-meta"><span class="course-tag tag-phys">Vật Lý</span><div class="course-dot"></div><span style="font-size:12px;color:var(--color-text-secondary)">Cơ bản → Nâng cao</span></div>
+        <h3>Vật Lý THPT — Ôn thi đại học</h3>
+        <p>Cơ học, Điện học, Sóng và Quang học. Nhiều dạng bài tập đặc trưng kèm phân tích chi tiết.</p>
+        <div class="course-footer">
+          <div class="course-progress-wrap"><div class="progress-label">95 bài giảng</div><div class="progress-bar"><div class="progress-fill" style="width:64%"></div></div></div>
+          <span class="lessons-count">64% học sinh hoàn thành</span>
+        </div>
+      </div>
+      <div class="course-card" onclick="sendPrompt('Cho tôi xem chi tiết khoá Hoá Học THPT ↗')">
+        <div class="course-meta"><span class="course-tag tag-chem">Hoá Học</span><div class="course-dot"></div><span style="font-size:12px;color:var(--color-text-secondary)">Cơ bản → Nâng cao</span></div>
+        <h3>Hoá Học THPT — Ôn thi đại học</h3>
+        <p>Hoá Vô Cơ và Hữu Cơ bám sát cấu trúc đề thi, nhiều mẹo ghi nhớ và giải nhanh.</p>
+        <div class="course-footer">
+          <div class="course-progress-wrap"><div class="progress-label">88 bài giảng</div><div class="progress-bar"><div class="progress-fill" style="width:55%"></div></div></div>
+          <span class="lessons-count">55% học sinh hoàn thành</span>
+        </div>
+      </div>
+      <div class="course-card" onclick="sendPrompt('Cho tôi xem chi tiết khoá Ngữ Văn THPT ↗')">
+        <div class="course-meta"><span class="course-tag tag-lit">Ngữ Văn</span><div class="course-dot"></div><span style="font-size:12px;color:var(--color-text-secondary)">Cơ bản → Nâng cao</span></div>
+        <h3>Ngữ Văn THPT — Ôn thi đại học</h3>
+        <p>Kỹ năng đọc hiểu, nghị luận văn học và nghị luận xã hội với dàn ý và bài mẫu chi tiết.</p>
+        <div class="course-footer">
+          <div class="course-progress-wrap"><div class="progress-label">72 bài giảng</div><div class="progress-bar"><div class="progress-fill" style="width:82%"></div></div></div>
+          <span class="lessons-count">82% học sinh hoàn thành</span>
         </div>
       </div>
     </div>
-    <div class="progress-bar-top"><div class="progress-bar-fill" id="progressFill" style="width:10%"></div></div>
+  </section>
 
-    <div class="exam-body">
-      <div class="question-panel" id="qPanel">
-        <div class="q-header">
-          <span class="q-badge" id="qSubject">Đại số</span>
-          <span class="q-number" id="qNum">Câu 1 / 10</span>
-          <div class="q-nav-arrows">
-            <button class="arrow-btn" id="prevBtn" onclick="navigate(-1)" disabled>&#8592;</button>
-            <button class="arrow-btn" id="nextBtn" onclick="navigate(1)">&#8594;</button>
-          </div>
-        </div>
-        <p class="q-text" id="qText"></p>
-        <div class="choices" id="choicesEl"></div>
-        <div class="explain-box" id="explainBox"></div>
-        <div class="q-footer">
-          <button class="flag-btn" id="flagBtn" onclick="toggleFlag()"><div class="flag-dot"></div> <span id="flagLabel">Đánh dấu</span></button>
-          <button class="submit-btn" id="mainActionBtn" onclick="mainAction()">Nộp bài</button>
+  <div class="divider"></div>
+
+  <section class="section">
+    <div class="section-label">Học sinh nói gì</div>
+    <div class="section-title">Kết quả thực tế từ học sinh</div>
+    <div class="section-sub">Hàng nghìn học sinh đã cải thiện điểm số và đậu vào trường đại học mơ ước.</div>
+    <div class="testimonials">
+      <div class="testi-card">
+        <div class="testi-score">9.2 Toán</div>
+        <p class="testi-text">"Nhờ hệ thống bài tập phân cấp, em đã từ 6 điểm lên 9.2 sau 3 tháng ôn. Thầy giảng rất dễ hiểu và chi tiết."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:var(--color-background-info);color:var(--color-text-info)">MH</div>
+          <div><div class="testi-name">Tuấn Minh</div><div class="testi-school">THPT Nghi Lộc 3 — A2k44</div></div>
         </div>
       </div>
-
-      <div class="sidebar">
-        <div class="sidebar-title">Câu hỏi</div>
-        <div class="q-grid" id="qGrid"></div>
-        <div class="legend">
-          <div class="legend-item"><div class="legend-dot" style="background:#e6f1fb;border:0.5px solid #85b7eb"></div> Đã trả lời</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#faeeda;border:0.5px solid #ef9f27"></div> Đánh dấu</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary)"></div> Chưa làm</div>
+      <div class="testi-card">
+        <div class="testi-score">1550 điểm SAT</div>
+        <p class="testi-text">"Phòng thi thử giúp em quen áp lực thi thật. Em đạt 1550 trong kỳ thi SAT"</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:var(--color-background-success);color:var(--color-text-success)">HA</div>
+          <div><div class="testi-name">Hữu Khánh</div><div class="testi-school">ĐH Pheenika Hà Nội — K2024</div></div>
         </div>
-        <div class="sidebar-title">Tổng kết</div>
-        <div class="sidebar-stats">
-          <div class="stat-mini"><div class="stat-mini-num" id="doneCount">0</div><div class="stat-mini-label">Đã làm</div></div>
-          <div class="stat-mini"><div class="stat-mini-num" id="leftCount">10</div><div class="stat-mini-label">Còn lại</div></div>
-          <div class="stat-mini"><div class="stat-mini-num" id="flagCount">0</div><div class="stat-mini-label">Đánh dấu</div></div>
-          <div class="stat-mini"><div class="stat-mini-num" id="timeLeft2">90</div><div class="stat-mini-label">Phút còn</div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-score">8.8 Vật Lý</div>
+        <p class="testi-text">"Bộ tài liệu PDF rất có hệ thống, em in ra ôn mọi lúc mọi nơi. Tiết kiệm thời gian hơn nhiều so với tự tổng hợp."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#fbeaf0;color:#993556">PT</div>
+          <div><div class="testi-name">NN</div> Đặng Tài <div class="testi-school">ĐHKT Quốc Dân — K2024</div></div>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="result-screen" id="resultScreen">
-    <div class="score-ring"><div class="score-big" id="scoreBig">8</div><div class="score-denom" id="scoreDenom">/ 10</div></div>
-    <div class="result-title" id="resultTitle">Xuất sắc! Bạn đã làm rất tốt.</div>
-    <p class="result-sub" id="resultSub">Điểm số của bạn cao hơn 87% học sinh cùng lớp.<br>Hãy xem lại các câu sai để củng cố kiến thức nhé.</p>
-    <div class="result-grid">
-      <div class="result-stat"><div class="result-stat-num" id="rCorrect" style="color:#27500a">—</div><div class="result-stat-label">Câu đúng</div></div>
-      <div class="result-stat"><div class="result-stat-num" id="rWrong" style="color:#a32d2d">—</div><div class="result-stat-label">Câu sai</div></div>
-      <div class="result-stat"><div class="result-stat-num" id="rTime" style="color:#1a56db">—</div><div class="result-stat-label">Phút làm</div></div>
-    </div>
-    <div class="result-actions">
-      <button class="submit-btn" onclick="reviewMode()">Xem đáp án chi tiết</button>
-      <button style="background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:6px;padding:7px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-sans);color:var(--color-text-primary)" onclick="sendPrompt('Phân tích điểm yếu của tôi và gợi ý bài ôn tập phù hợp ↗')">Phân tích điểm yếu ↗</button>
+  </section>	
+  <div class="cta-section">
+    <h2>Sẵn sàng bứt phá điểm số?</h2>
+    <p>Tham gia cùng hơn 12,000 học sinh đang ôn luyện mỗi ngày.<br>Miễn phí hoàn toàn trong 7 ngày đầu.</p>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="btn-primary" onclick="sendPrompt('Tôi muốn đăng ký tài khoản miễn phí ↗')">Đăng ký miễn phí</button>
+      <button style="background:transparent;border:0.5px solid var(--color-border-secondary);color:var(--color-text-primary);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.2s" onmouseover="this.style.background='var(--color-background-secondary)'" onmouseout="this.style.background='transparent'" onclick="sendPrompt('Cho tôi xem demo hệ thống thi thử ↗')">Xem demo</button>
     </div>
   </div>
 </div>
-
-<script>
-const questions = [
-  {subject:"Đại số",text:"Cho hàm số f(x) = x³ − 3x + 2. Hàm số đạt cực tiểu tại điểm x bằng bao nhiêu?",choices:["x = −1","x = 1","x = 0","x = 2"],correct:1,explain:"Tính f'(x) = 3x² − 3 = 0 → x = ±1. Kiểm tra f''(1) = 6 > 0 → x = 1 là điểm cực tiểu."},
-  {subject:"Giải tích",text:"Nguyên hàm của hàm số f(x) = 2x + cos(x) là:",choices:["x² − sin(x) + C","x² + sin(x) + C","2x² + sin(x) + C","x + sin(x) + C"],correct:1,explain:"∫(2x + cos x)dx = x² + sin(x) + C. Tích phân từng hạng tử riêng lẻ."},
-  {subject:"Hình học",text:"Trong không gian Oxyz, điểm M(1; 2; −3) cách mặt phẳng (Oxy) một khoảng bằng bao nhiêu?",choices:["1","2","3","√14"],correct:2,explain:"Khoảng cách từ điểm M(x₀,y₀,z₀) đến mặt phẳng Oxy là |z₀| = |−3| = 3."},
-  {subject:"Đại số",text:"Phương trình log₂(x − 1) = 3 có nghiệm x bằng bao nhiêu?",choices:["x = 7","x = 8","x = 9","x = 10"],correct:2,explain:"log₂(x−1) = 3 → x−1 = 2³ = 8 → x = 9. Kiểm tra x = 9 > 1 (thoả mãn ĐK)."},
-  {subject:"Giải tích",text:"Diện tích hình phẳng giới hạn bởi y = x² và y = x là:",choices:["1/6","1/4","1/3","1/2"],correct:0,explain:"Giao điểm: x² = x → x = 0 và x = 1. S = ∫₀¹(x − x²)dx = [x²/2 − x³/3]₀¹ = 1/2 − 1/3 = 1/6."},
-  {subject:"Hình học",text:"Cho hình chóp S.ABCD với đáy ABCD là hình vuông cạnh a. Nếu SA ⊥ đáy và SA = a thì thể tích hình chóp bằng:",choices:["a³/3","a³/4","a³/6","a³/2"],correct:0,explain:"V = (1/3) × S_đáy × h = (1/3) × a² × a = a³/3."},
-  {subject:"Đại số",text:"Số nghiệm thực của phương trình x⁴ − 5x² + 4 = 0 là:",choices:["0","2","3","4"],correct:3,explain:"Đặt t = x², t ≥ 0: t² − 5t + 4 = 0 → t = 1 hoặc t = 4. Mỗi t dương cho 2 nghiệm x → 4 nghiệm."},
-  {subject:"Giải tích",text:"Giới hạn lim(x→0) [sin(3x) / x] bằng bao nhiêu?",choices:["0","1","3","Không tồn tại"],correct:2,explain:"Dùng giới hạn cơ bản lim(x→0)[sin(u)/u] = 1: sin(3x)/x = 3·sin(3x)/(3x) → 3×1 = 3."},
-  {subject:"Hình học",text:"Trong mặt phẳng, phương trình đường tròn tâm I(2; −1), bán kính r = 3 là:",choices:["(x−2)²+(y+1)²=3","(x+2)²+(y−1)²=9","(x−2)²+(y+1)²=9","(x−2)²+(y−1)²=9"],correct:2,explain:"PT đường tròn: (x−a)²+(y−b)²=r². Tâm I(2;−1), r=3 → (x−2)²+(y+1)²=9."},
-  {subject:"Đại số",text:"Tổng tất cả các nghiệm của phương trình 2sin²x − 3sinx + 1 = 0 trong [0; 2π] là:",choices:["π","3π/2","5π/2","7π/6"],correct:2,explain:"2sin²x−3sinx+1=0 → (2sinx−1)(sinx−1)=0 → sinx=1/2 hoặc sinx=1. Nghiệm: π/6, 5π/6, π/2. Tổng = π/6+5π/6+π/2 = π+π/2 = 5π/2."}
-];
-
-let current=0, answers=Array(10).fill(null), flags=Array(10).fill(false);
-let totalSecs=90*60, timerInterval=null, startTime=Date.now(), submitted=false, reviewModeOn=false;
-
-function renderQ(){
-  const q=questions[current];
-  document.getElementById('qSubject').textContent=q.subject;
-  document.getElementById('qNum').textContent=`Câu ${current+1} / ${questions.length}`;
-  document.getElementById('qText').textContent=q.text;
-  document.getElementById('progressFill').style.width=`${((current+1)/questions.length)*100}%`;
-  const fb=document.getElementById('flagBtn');
-  fb.className='flag-btn'+(flags[current]?' flagged':'');
-  document.getElementById('flagLabel').textContent=flags[current]?'Đã đánh dấu':'Đánh dấu';
-  document.getElementById('prevBtn').disabled=current===0;
-  document.getElementById('nextBtn').disabled=current===questions.length-1;
-  const ex=document.getElementById('explainBox');
-  ex.className='explain-box'+(reviewModeOn&&answers[current]!==null?' show':'');
-  ex.textContent=reviewModeOn?'Giải thích: '+q.explain:'';
-  const ch=document.getElementById('choicesEl');
-  ch.innerHTML='';
-  q.choices.forEach((c,i)=>{
-    const d=document.createElement('div');
-    let cls='choice';
-    if(reviewModeOn&&answers[current]!==null){
-      if(i===q.correct)cls+=' correct';
-      else if(i===answers[current]&&answers[current]!==q.correct)cls+=' wrong';
-    } else if(answers[current]===i) cls+=' selected';
-    if(reviewModeOn&&answers[current]!==null) d.style.cursor='default';
-    d.className=cls;
-    d.innerHTML=`<div class="choice-key">${['A','B','C','D'][i]}</div><div class="choice-text">${c}</div>`;
-    if(!reviewModeOn&&!submitted) d.onclick=()=>selectAnswer(i);
-    ch.appendChild(d);
-  });
-  renderGrid();
-  renderStats();
-}
-
-function selectAnswer(i){
-  if(submitted)return;
-  answers[current]=i;
-  renderQ();
-}
-
-function navigate(dir){
-  current=Math.max(0,Math.min(questions.length-1,current+dir));
-  renderQ();
-}
-
-function toggleFlag(){
-  if(submitted)return;
-  flags[current]=!flags[current];
-  renderQ();
-}
-
-function renderGrid(){
-  const g=document.getElementById('qGrid');
-  g.innerHTML='';
-  questions.forEach((_,i)=>{
-    const d=document.createElement('div');
-    let cls='q-dot';
-    if(reviewModeOn&&answers[i]!==null){
-      cls+=answers[i]===questions[i].correct?' correct-dot':' wrong-dot';
-    } else if(i===current)cls+=' active';
-    else if(flags[i])cls+=' flagged-dot';
-    else if(answers[i]!==null)cls+=' answered';
-    d.className=cls;
-    d.textContent=i+1;
-    d.onclick=()=>{current=i;renderQ()};
-    g.appendChild(d);
-  });
-}
-
-function renderStats(){
-  const done=answers.filter(a=>a!==null).length;
-  document.getElementById('doneCount').textContent=done;
-  document.getElementById('leftCount').textContent=questions.length-done;
-  document.getElementById('flagCount').textContent=flags.filter(Boolean).length;
-}
-
-function mainAction(){
-  if(!submitted){submitExam();}
-}
-
-function submitExam(){
-  submitted=true;
-  clearInterval(timerInterval);
-  const correct=answers.filter((a,i)=>a===questions[i].correct).length;
-  const wrong=answers.filter((a,i)=>a!==null&&a!==questions[i].correct).length;
-  const elapsed=Math.round((Date.now()-startTime)/60000);
-  document.getElementById('examMain').style.display='none';
-  const rs=document.getElementById('resultScreen');
-  rs.className='result-screen show';
-  document.getElementById('scoreBig').textContent=correct;
-  document.getElementById('scoreDenom').textContent=`/ ${questions.length}`;
-  document.getElementById('rCorrect').textContent=correct;
-  document.getElementById('rWrong').textContent=wrong;
-  document.getElementById('rTime').textContent=Math.max(1,elapsed);
-  const pct=Math.round(correct/questions.length*10);
-  document.getElementById('resultTitle').textContent=pct>=8?'Xuất sắc! Bạn làm rất tốt.':pct>=6?'Khá tốt! Còn chỗ cải thiện.':'Cần ôn thêm một chút nữa.';
-  document.getElementById('resultSub').textContent=`Bạn đúng ${correct}/${questions.length} câu (${Math.round(correct/questions.length*100)}%). Xem đáp án chi tiết để hiểu chỗ sai nhé.`;
-}
-
-function reviewMode(){
-  reviewModeOn=true;
-  submitted=true;
-  document.getElementById('examMain').style.display='block';
-  document.getElementById('resultScreen').className='result-screen';
-  document.getElementById('mainActionBtn').textContent='Thi lại';
-  document.getElementById('mainActionBtn').onclick=()=>location.reload();
-  current=0;
-  renderQ();
-}
-
-function startTimer(){
-  timerInterval=setInterval(()=>{
-    totalSecs--;
-    if(totalSecs<=0){clearInterval(timerInterval);submitExam();return;}
-    const m=Math.floor(totalSecs/60), s=totalSecs%60;
-    const td=document.getElementById('timerDisp');
-    td.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    td.className='timer-box'+(totalSecs<=300?' danger':totalSecs<=600?' warn':'');
-    document.getElementById('timeLeft2').textContent=m;
-  },1000);
-}
-
-renderQ();
-startTimer();
-</script>
